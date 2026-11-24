@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroScan - Brain Tumor AI Diagnostic Workstation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Background Grid -->
+    <div class="grid-background"></div>
+    <div class="glow-orb red"></div>
+    <div class="glow-orb blue"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="logo-area">
+                <span class="logo-icon">▲</span>
+                <div class="logo-text">
+                    <h1>NEUROSCAN</h1>
+                    <p>AI Diagnostic Workstation</p>
+                </div>
+            </div>
+            <div class="system-status">
+                <div class="status-item">
+                    <span class="status-label">SERVER STATUS</span>
+                    <span class="status-value online" id="server-status">ONLINE</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">MODEL</span>
+                    <span class="status-value active">VGG16 CPU-Engine</span>
+                </div>
+                <div class="status-item">
+                    <button class="settings-btn" id="open-settings-btn">⚙ LABEL CONFIG</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="main-workspace">
+            <!-- Left Panel: Viewport -->
+            <section class="panel viewport-panel">
+                <div class="panel-header">
+                    <h2><span class="header-icon">⚇</span> MRI ACQUISITION VIEWPORT</h2>
+                    <span class="panel-subtitle">DICOM / IMAGE LOADER</span>
+                </div>
+                <div class="viewport-content">
+                    <div class="mri-viewer" id="mri-viewer">
+                        <!-- Crosshair Overlays -->
+                        <div class="viewer-crosshair horiz"></div>
+                        <div class="viewer-crosshair vert"></div>
+                        <div class="viewer-grid"></div>
+                        
+                        <!-- Scanning Sweep Line -->
+                        <div class="scanline" id="scanline"></div>
+
+                        <!-- Image Preview -->
+                        <img id="image-preview" src="" alt="MRI Preview" class="hidden">
+                        
+                        <!-- Upload Placeholder -->
+                        <div class="upload-placeholder" id="upload-placeholder">
+                            <span class="upload-icon">⤓</span>
+                            <h3>Drag & Drop MRI Scan</h3>
+                            <p>or click to browse local files</p>
+                            <span class="file-hint">Supports JPEG, PNG, TIFF</span>
+                        </div>
+
+                        <!-- Scanning State Overlay -->
+                        <div class="scanning-overlay hidden" id="scanning-overlay">
+                            <div class="scanner-dot"></div>
+                            <div class="scanning-text">ACQUIRING NEURAL METRICS...</div>
+                        </div>
+
+                        <!-- Calibration Markings -->
+                        <div class="calibration-mark top">L</div>
+                        <div class="calibration-mark right">P</div>
+                        <div class="calibration-mark bottom">R</div>
+                        <div class="calibration-mark left">A</div>
+                    </div>
+                    
+                    <div class="viewport-controls">
+                        <input type="file" id="image-input" accept="image/*" class="hidden">
+                        <button class="btn btn-primary" id="select-image-btn">LOAD MRI IMAGE</button>
+                        <button class="btn btn-secondary hidden" id="reset-image-btn">CLEAR ACQUISITION</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Diagnostics -->
+            <section class="panel diagnostics-panel">
+                <div class="panel-header">
+                    <h2><span class="header-icon">📊</span> DIAGNOSTIC REPORT</h2>
+                    <span class="panel-subtitle">METRICS & INFERENCE SUMMARY</span>
+                </div>
+                <div class="diagnostics-content">
+                    <!-- Idle State -->
+                    <div class="diagnostics-idle" id="diagnostics-idle">
+                        <div class="idle-graphic">◌</div>
+                        <h3>Awaiting Scan Acquisition</h3>
+                        <p>Upload or drag an MRI scan into the viewport to run the AI diagnostics classifier.</p>
+                    </div>
+
+                    <!-- Results State -->
+                    <div class="diagnostics-results hidden" id="diagnostics-results">
+                        <!-- Primary Diagnosis Card -->
+                        <div class="diagnosis-card" id="diagnosis-card">
+                            <div class="card-glow"></div>
+                            <div class="diagnosis-header">
+                                <span>PRIMARY AI CLASSIFICATION</span>
+                                <span class="badge" id="risk-badge">HIGH RISK</span>
+                            </div>
+                            <div class="diagnosis-name" id="primary-diagnosis">GLIOMA DETECTED</div>
+                            <div class="diagnosis-confidence">
+                                <span class="conf-label">Confidence Probability</span>
+                                <span class="conf-value" id="primary-confidence">98.4%</span>
+                            </div>
+                        </div>
+
+                        <!-- Probability Breakdown -->
+                        <div class="breakdown-section">
+                            <h3>CLASSIFICATION PROBABILITIES</h3>
+                            <div class="probabilities-list" id="probabilities-list">
+                                <!-- JavaScript populated progress bars -->
+                            </div>
+                        </div>
+
+                        <!-- System Metadata -->
+                        <div class="metadata-section">
+                            <h3>ACQUISITION METADATA</h3>
+                            <div class="metadata-grid">
+                                <div class="meta-item">
+                                    <span class="meta-label">INFERENCE TIME</span>
+                                    <span class="meta-value" id="meta-time">234 ms</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">RESOLUTION</span>
+                                    <span class="meta-value" id="meta-resolution">128 × 128 (Resized)</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">PROCESSOR</span>
+                                    <span class="meta-value">Vectorized NumPy Engine</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">WEIGHTS FILE</span>
+                                    <span class="meta-value">BrainTumor_VGG16.h5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Label Settings Drawer/Modal -->
+    <div class="settings-modal hidden" id="settings-modal">
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Label Mappings Settings</h2>
+                <button class="close-btn" id="close-settings-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Verified label order for this VGG16 model. Only change these if you retrained with a different class order:</p>
+                <form id="label-config-form">
+                    <div class="input-group">
+                        <label for="label-0">Index 0 — Other / Non-MRI</label>
+                        <input type="text" id="label-0" value="Other / Non-MRI" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="label-1">Index 1 — Meningioma</label>
+                        <input type="text" id="label-1" value="Meningioma" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="label-2">Index 2 — No Tumor</label>
+                        <input type="text" id="label-2" value="No Tumor" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="label-3">Index 3 — Glioma</label>
+                        <input type="text" id="label-3" value="Glioma" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="label-4">Index 4 — Pituitary Tumor</label>
+                        <input type="text" id="label-4" value="Pituitary Tumor" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="reset-labels-btn">Reset Defaults</button>
+                        <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

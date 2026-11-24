@@ -1,0 +1,4 @@
+flask>=3.0
+numpy>=1.26
+h5py>=3.10
+pillow>=10.0
